@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gics-javaopts
+  namespace: gics
+data:
+  JAVA_OPTS: |
+    -server 
+    -Xms1G 
+    -Xmx3G 
+    -XX:MetaspaceSize=256M 
+    -XX:MaxMetaspaceSize=1G 
+    -XX:StringTableSize=1000003 
+    -Djava.net.preferIPv4Stack=true 
+    -Djava.awt.headless=true 
+    -Djboss.modules.system.pkgs=org.jboss.byteman

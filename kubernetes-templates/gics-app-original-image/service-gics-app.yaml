@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+   name: gics-app
+   namespace: gics
+   labels:
+      app: gics-app
+spec:
+   ports:
+    - name: gics-app
+      port: 8080 
+      targetPort: 8080
+      protocol: TCP
+   selector:
+      app: gics-app

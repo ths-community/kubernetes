@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-gics
+  namespace: gics
+  labels:
+    app: mysql-gics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-gics
+  template:
+    metadata:
+      labels:
+        app: mysql-gics
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+      - name: mysql-gics
+        image: mysql:8.0.31
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 999
+          allowPrivilegeEscalation: false
+        ports:
+        - containerPort: 3306
+          name: mysql-gics
+        resources:
+          limits:
+            cpu: 300m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: mysql_root_password
+              name: mysql-gics
+        - name: MYSQL_GICS_USER
+          valueFrom:
+            secretKeyRef:
+              key: gics_user_login
+              name: mysql-gics
+        - name: MYSQL_GICS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: gics_user_password
+              name: mysql-gics
+        - name: MYSQL_NOTI_USER
+          valueFrom:
+            secretKeyRef:
+              key: noti_user
+              name: mysql-gics
+        - name: MYSQL_NOTI_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: noti_password
+              name: mysql-gics
+#        - name: MYSQL_GRAS_USER
+#          valueFrom:
+#            secretKeyRef:
+#              key: gras_user_login
+#              name: mysql-gics
+#        - name: MYSQL_GRAS_PASSWORD
+#          valueFrom:
+#            secretKeyRef:
+#              key: gras_user_password
+#              name: mysql-gics
+        volumeMounts:
+        - mountPath: /docker-entrypoint-initdb.d
+          name: gics-sql
+        - mountPath: /var/lib/mysql
+          name: mysql-gics-data
+        - mountPath: /etc/mysql/conf.d/logs.cnf
+          name: mysql-gics-config
+          subPath: logs.cnf
+      volumes:
+        - name: mysql-gics-data
+          persistentVolumeClaim:
+            claimName: mysql-gics-data
+        - name: gics-sql
+          persistentVolumeClaim:
+            claimName: gics-sqls
+        - name: mysql-gisc-config
+          configMap:
+            name: mysql-gics-config

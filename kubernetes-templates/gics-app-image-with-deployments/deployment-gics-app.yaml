@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gics-app
+  namespace: gics
+  labels:
+    app: gics-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gics-app
+  template:
+    metadata:
+      labels:
+        app: gics-app
+    spec:
+      securityContext:
+        runAsNonRoot: true
+#      imagePullSecrets:
+#        - name: <Name of secret for repository>
+      containers:
+      - name: gics-app
+        image: <Name of image with deloyments>
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 1111
+          allowPrivilegeEscalation: false
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2G
+          requests:
+            cpu: 100m
+            memory: 1G
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 120
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 120
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 1
+        env:
+        - name: TTP_GICS_DB_HOST
+          value: mysql-gics
+        - name: TTP_GICS_DB_PORT
+          value: "3306"
+        - name: TTP_GICS_DB_NAME
+          value: gics
+        - name: TTP_GICS_DB_USER
+          valueFrom:
+            secretKeyRef:
+              key: user_login
+              name: mysql-gics
+        - name: TTP_GICS_DB_PASS
+          valueFrom:
+            secretKeyRef:
+              key: user_password
+              name: mysql-gics
+        - name: TTP_NOTI_DB_HOST
+          value: mysql-gics
+        - name: TTP_NOTI_DB_PORT
+          value: "3306"
+        - name: TTP_NOTI_DB_NAME
+          value: notification_service
+        - name: TTP_NOTI_DB_USER
+          valueFrom:
+            secretKeyRef:
+              key: noti_user
+              name: mysql-gics
+        - name: TTP_NOTI_DB_PASS
+          valueFrom:
+            secretKeyRef:
+              key: noti_password
+              name: mysql-gics
+#        - name: TTP_GICS_WEB_AUTH_MODE
+#          value: keycloak
+#        - name: TTP_KEYCLOAK_SERVER_URL
+#          value: <PROTOCOL://HOST_OR_IP>
+#        - name: TTP_KEYCLOAK_SSL_REQUIRED
+#          value: <none|external|all>
+#        - name: TTP_KEYCLOAK_REALM
+#          value: <REALM>
+#        - name: TTP_KEYCLOAK_CLIENT_ID
+#          value: <CLIENT_ID>
+#        - name: TTP_KEYCLOAK_CLIENT_SECRET
+#          valueFrom:
+#            secretKeyRef:
+#              key: clientsecret
+#              name: clientsecret-gics-app
+#        - name: TTP_KEYCLOAK_USE_RESOURCE_ROLE_MAPPINGS
+#          value: <"true"|"false">
+#        - name: TTP_KEYCLOAK_CONFIDENTIAL_PORT
+#          value: <CONFIDENTIAL_PORT>
+#        - name: TTP_GICS_AUTH_DOMAIN_ROLES
+#          value: <none|external|all>
+        - name: WF_ADMIN_PASS
+          valueFrom:
+            secretKeyRef:
+              key: wildfly_pass
+              name: gics-wildfly-pass
+        - name: JAVA_OPTS
+          valueFrom:
+            configMapKeyRef:
+              name: gics-javaopts
+              key: JAVA_OPTS

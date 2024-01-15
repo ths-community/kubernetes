@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-gics-config
+  namespace: gics
+data:
+  logs.cnf: |
+    [mysqld]
+    binlog_expire_logs_seconds = 1209600
+    expire_logs_days = 14

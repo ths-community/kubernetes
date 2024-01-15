@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: gics
+  finalizers:
+  - kubernetes.io/pvc-protection
+  name: mysql-gics-data
+spec:
+  storageClassName: basic-csi
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 3Gi
