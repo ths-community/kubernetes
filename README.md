@@ -18,9 +18,8 @@ The provided script **set_users_with_credentials.sh** can be used to configure o
 
 ## Compatibility
 
-![](https://www.ths-greifswald.de/wp-content/uploads/2019/01/gICS-Logo-ohne-Text-160y.png)
-
-v2023.1.3
+- Kubernetes v1.25 
+- gICS v2023.1.3
 
 ## Additional information
 
